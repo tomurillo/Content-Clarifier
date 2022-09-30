@@ -37,3 +37,30 @@ Edit line 53 to be like this:
  Save the file and start the server. 
  If option A or B did not work for you, good luck searching and makesure you document your findings. 
 
+<hr>
+
+## Install (2022 version)
+
+1. Install Java 8:
+
+```bash
+sudo apt install openjdk-8-jdk
+```
+
+2. Set the `JAVA_HOME` environment variable accordingly:
+
+```bash
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+```
+
+3. You may need to install gyp as well:
+
+```bash
+pip install git+https://chromium.googlesource.com/external/gyp
+```
+
+4. Now you can finally run:
+
+```bash
+npm install
+```
