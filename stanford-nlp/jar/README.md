@@ -1,0 +1,1 @@
+**Important!** You should download `stanford-corenlp-4.5.1.zip` file and unzip all contents to this folder. You can download the file [here](https://nlp.stanford.edu/software/stanford-corenlp-4.5.1.zip). This file couldn't be pushed to GitHub & npm because of its big size.
