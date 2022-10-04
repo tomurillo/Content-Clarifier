@@ -27,8 +27,8 @@ var download                = require('download-file');
 
 var DiscoveryV1 = require('watson-developer-cloud/discovery/v1');
 
-// requires stanford-corenlp-full-2014-01-04.zip uzipped to jar dir in node_modules/stanford-simple-nlp
-var StanfordSimpleNLP       = require('stanford-simple-nlp');
+// requires stanford-corenlp-4.5.1.zip uzipped to ./stanford-nlp/jar
+var StanfordSimpleNLP       = require('./stanford-nlp/index');
 var stanfordSimpleNLP       = new StanfordSimpleNLP.StanfordSimpleNLP();
 
 // Full text search for AAC symbols
