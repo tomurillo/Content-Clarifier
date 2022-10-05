@@ -287,7 +287,7 @@ processURLToText = function (url, callback) {
 
 UrlUtil.prototype.evaluateURLOrDocumentReturnText = function(url, callback) {
     this.evaluateURLType(url, function(response) {
-        if(response.statusCode != 200){
+        if(response.statusCode !== 200){
             //return callback(response.message); Surface statusCode
             return callback({statusCode: response.statusCode, message: response.message}); 
         } else {

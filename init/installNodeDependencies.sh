@@ -15,7 +15,6 @@
 # 4. Requires Java JDK 7 (1.7.80) installed on local OS http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
 #
 npm install angular-route@~1.4.1
-npm install body-parser@^1.5.2
 npm install express@3.x
 npm install request@*
 npm install express-session@1.14.0

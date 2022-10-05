@@ -7,7 +7,6 @@
  */
 
 var express                 = require('express');
-var bodyParser              = require('body-parser');
 var multer                  = require('multer');
 var request                 = require('request');
 var cors                    = require('cors');
@@ -140,35 +139,32 @@ var app = express();
 
 app.use(cors()); // CORS-enabled for all origins
 app.use(express.static(__dirname)); // Serve the web content
-//app.use(bodyParser.json()); // parse POST requests
-app.use(bodyParser.json({limit: '5mb'})); // support large file
-app.use(bodyParser.urlencoded({extended: true, limit: '5mb'})); // support large files
+app.use(express.json({limit: '5mb'}));  // parse POST requests
+app.use(express.urlencoded({extended: true, limit: '5mb'})); //Parse URL-encoded bodies
 
 app.use(cookieParser());
 
 var sess = {
     secret: 'hQp9VcWTEAdRvpXH',
     cookie: {}
-}
+};
 if (app.get('env') === 'production') {
-    app.set('trust proxy', 1) // trust first proxy
-    sess.cookie.secure = true // serve secure cookies
+    app.enable('trust proxy'); // trust first proxy
+    sess.cookie.secure = true; // serve secure cookies
 }
 app.use(session(sess));
 
 app.use(compression()); // Support Gzip compression
 
 // Redirect all .mybluemix.net requests to HTTPS
-// https://www.tonyerwin.com/2014/09/redirecting-http-to-https-with-nodejs.html
-app.enable('trust proxy');
 app.use (function (req, res, next) {
-        if (req.secure) {
-                // request was via https, so do no special handling
-                next();
-        } else {
-                // request was via http, so redirect to https
-                res.redirect('https://' + req.headers.host + req.url);
-        }
+    if (req.secure) {
+        // request was via https, so do no special handling
+        next();
+    } else {
+        // request was via http, so redirect to https
+        res.redirect('https://' + req.headers.host + req.url);
+    }
 });
 
 
@@ -179,7 +175,7 @@ app.options('*', cors()); // Enable CORS pre-flight across-the-board
 var pool;
 var mysql      = require('mysql');
 
-if(C.CC_ENVIRONMENT == 'staging') 
+if(C.CC_ENVIRONMENT === 'staging')
 {
     pool  = mysql.createPool({
         acquireTimeout : 20000,
@@ -192,8 +188,9 @@ if(C.CC_ENVIRONMENT == 'staging')
         password: C.CC_DB_STAGING_PASS,
         database : C.CC_DB_STAGING_NAME
     });
+    console.log(`MySQL pool created on ${C.CC_DB_STAGING_HOST}:${C.CC_DB_STAGING_PORT}`);
 }
-else if(C.CC_ENVIRONMENT == 'production'){ 
+else if(C.CC_ENVIRONMENT === 'production'){
     
     pool  = mysql.createPool({
         acquireTimeout : 20000,
@@ -205,7 +202,8 @@ else if(C.CC_ENVIRONMENT == 'production'){
         user: C.CC_DB_PROD_USER,
         password: C.CC_DB_PROD_PASS,
         database : C.CC_DB_PROD_NAME
-    });    
+    });
+    console.log(`MySQL pool created on ${C.CC_DB_PROD_HOST}:${C.CC_DB_PROD_PORT}`);
 }
 else{
     console.error("SERVER ERROR - environment not set!");
@@ -240,7 +238,7 @@ process.on('uncaughtException', function (err) {
 // ------------------ Services ------------------------
 
 app.get('/',function(req,res,next){
-    res.sendfile('./public/index.html');
+    res.sendFile('./public/index.html');
 });
 
 
@@ -248,21 +246,22 @@ app.get('/',function(req,res,next){
 app.post('/getUrlText', function(req,res,next){
     console.log(req.body.url);
     urlUtil.evaluateURLOrDocumentReturnText(req.body.url, function(response) {
-        // Surface failures from urlUtil.evaluateURLOrDocumentReturnText       
-        if(response.statusCode != 200){
+        // Surface failures from urlUtil.evaluateURLOrDocumentReturnText
+        let responseObj = null;
+        let json = null;
+        if(response.statusCode !== 200){
             res.writeHead(200, {"Content-Type": "application/json"});
             responseObj = { status: "error", code: response.statusCode, message: response.message };
-            var json = JSON.stringify(responseObj);
+            json = JSON.stringify(responseObj);
             res.end(json);
             return;
         }
         else{
             res.writeHead(200, {"Content-Type": "application/json"});
             responseObj = { status: "success", code: response.statusCode, text: response.text };
-            var json = JSON.stringify(responseObj);
+            json = JSON.stringify(responseObj);
             res.end(json);
             return;
-            
         }
     });
     
