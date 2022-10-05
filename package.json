@@ -28,6 +28,7 @@
   "dependencies": {
     "angular-route": "~1.4.1",
     "automated-readability": "0.1.0",
+    "axios": "^1.0.0",
     "bluemix-objectstorage": "0.1.2",
     "cfenv": "1.0.3",
     "coffeescript": "^2.7.0",
@@ -51,13 +52,12 @@
     "natural": "0.4.0",
     "node-gyp": "3.4.0",
     "node-schedule": "1.1.1",
-    "request": "2.70.0",
     "sentence-tokenizer": "0.0.7",
     "sparql-client": "0.2.0",
     "striptags": "3.0.1",
     "syllable": "2.0.0",
     "uuid": "2.0.2",
-    "validator": "8.0.0",
+    "validator": "13.7.0",
     "watson-developer-cloud": "^3.16.1",
     "word-count": "0.2.2",
     "xml2js": "^0.4.23"

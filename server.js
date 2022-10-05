@@ -8,7 +8,6 @@
 
 var express                 = require('express');
 var multer                  = require('multer');
-var request                 = require('request');
 var cors                    = require('cors');
 var compression             = require('compression'); // Support gzip compression
 var vcapServices            = require('vcap_services');
@@ -148,7 +147,7 @@ var sess = {
     secret: 'hQp9VcWTEAdRvpXH',
     cookie: {}
 };
-if (app.get('env') === 'production') {
+if (C.CC_ENVIRONMENT === 'production') {
     app.enable('trust proxy'); // trust first proxy
     sess.cookie.secure = true; // serve secure cookies
 }
@@ -207,6 +206,7 @@ else if(C.CC_ENVIRONMENT === 'production'){
 }
 else{
     console.error("SERVER ERROR - environment not set!");
+    process.exit(1);
 }
 
 

@@ -1,5 +1,5 @@
 var http = require('http');
-var request = require('request');
+var axios = require('axios');
 var validator = require('validator');
 var Tokenizer = require('sentence-tokenizer');
 var DocumentConversion = require('../watson/document-conversion');
@@ -32,14 +32,17 @@ function UrlUtil() {
         var contentType = null;
         console.log('------------ ')
         console.log(url);
-        originalfilename = url.substring(url.indexOf("uploads/")+8);
-        //console.log(originalfilename);
-        if(url === undefined || url === null || url === '') {
+        if (!url) {
             return callback( { status:'error', statusCode: 400, message: 'No value was entered for the URL'});
         }
-         // if (!validator.isURL(url)){ Must set validator options
-         if (!validator.isURL(url,{require_tld:false, require_host:false, allow_underscores:true})){            
-            return callback({ status:'error', statusCode: 400, message: 'The value passed in for the URL is not in a proper url format:  ' + url});
+        originalfilename = url.substring(url.indexOf("uploads/")+8);
+        //console.log(originalfilename);
+        if (!validator.isURL(url, {require_tld:false, require_host:false, allow_underscores:true})){
+            return callback({
+                status:'error',
+                statusCode: 400,
+                message: 'The value passed in for the URL is not in a proper url format:  ' + url
+            });
         }
         
         //from server.js - to Fix Issue #36
@@ -47,85 +50,71 @@ function UrlUtil() {
             url = encodeURI(url)
         }
 
-        var urlReq;
-        try{
-            urlReq = request.get(url);
-        }
-        catch(e){
-            return callback({ status:'error', statusCode: 400, message: 'Unsupported URL format. Neither http:// or https:// was observed.'});  
-        }
-        urlReq.on('response', function(response) {
-            if (response.statusCode !== 200) {
-                return callback({ status:'error', statusCode: 400, message: 'Response status was ' + response.statusCode});
-            }
-            contentType = response.headers['content-type'];
-            
-            //
-            // Processing a link URL link to a document
-            // 
-            if(contentType != undefined && contentType != null && 
-            
-            //documentTypes.includes(contentType)){ Doesn't support v5.9.0 and below 
-             documentTypes.join(" ").indexOf(contentType) !== -1){ 
-                
-                console.log("Processing a URL link to a document with contentType: "+contentType);
-                //URL leads to a document
-                processDocumentConversionToText(urlReq, url,  contentType, function(response) {  //anonymous function will run when the callback is called
-                    callback(response);
-                });
-            } 
-            else {
-                //
-                // Processing a regular URL, not a link to a document
-                // 
-                
-                 console.log("Processing a regular URL link with contentType: "+contentType);
-                if(contentType.indexOf('/html') == -1){
-                    console.log("Found invalid file content type while attempting to process a regular URL");                    
-                    //We got here, but we aren't actually processing a regular URL...a link to a unsupported file type may have slipped through (e.g. .txt)
-                    return callback({ status:'error', statusCode: 400, message: 'Unsupported URL format.'});  
-                 }
-                else{
-                   var naturalLanguageUnderstanding = new NaturalLanguageUnderstanding();
-                    var nluParameters = {"features": {"concepts": {}}, "return_analyzed_text": true};
-                    naturalLanguageUnderstanding.doRequest("url", url, nluParameters, function(res)  {
-                        if(res.statusCode == 200 && res.body != null && res.body.analyzed_text != undefined){
-                            return callback({ status:'success', statusCode: 200, text: res.body.analyzed_text});
-                        } else {
-                            return callback({ status:'error', statusCode: 400, message: 'NLU processing did not work correctly.'});
-                        }
+        let urlReq;
+        axios.get(url)
+            .then(function (response) {
+                if (response.status !== 200) {
+                    return callback({
+                        status:'error',
+                        statusCode: 400,
+                        message: `Response status ${response.status}: ${response.statusText}`
                     });
-
-                }    
-                /*var naturalLanguageUnderstanding = new NaturalLanguageUnderstanding();
-                var nluParameters = {"features": {"concepts": {}}, "return_analyzed_text": true};
-                naturalLanguageUnderstanding.doRequest("url", url, nluParameters, function(res)  {
-                    if(res.statusCode == 200 && res.body != null && res.body.analyzed_text != undefined){
-                        return callback({ status:'success', statusCode: 200, text: res.body.analyzed_text});
+                }
+                urlReq = response.request;
+                contentType = response.headers['content-type'];
+                // Processing a URL link to a document
+                if (contentType && documentTypes.indexOf(contentType) !== -1) {
+                    console.log(`Processing a URL link to a document with contentType: ${contentType}`);
+                    // URL leads to a document
+                    processDocumentConversionToText(urlReq, url, contentType,
+                        function(response) {
+                            callback(response);
+                    });
+                // Processing a regular URL, not a link to a document
+                } else {
+                    console.log(`Processing a regular URL link with contentType: ${contentType}`);
+                    if (contentType.indexOf('/html') === -1) {
+                        console.log(`Found invalid file content type while attempting to process a regular URL: ${contentType}`);
+                        // We got here, but we aren't actually processing a regular URL...
+                        // a link to an unsupported file type may have slipped through (e.g. .txt)
+                        return callback({ status:'error', statusCode: 400, message: 'Unsupported URL format.'});
                     } else {
-                        return callback({ status:'error', statusCode: 400, message: 'NLU processing did not work correctly.'});
+                        const naturalLanguageUnderstanding = new NaturalLanguageUnderstanding();
+                        const nluParameters = {"features": {"concepts": {}}, "return_analyzed_text": true};
+                        naturalLanguageUnderstanding.doRequest("url", url, nluParameters,
+                            function(res)
+                            {
+                                if(res.statusCode === 200 && res.body && res.body.analyzed_text !== undefined){
+                                    return callback({
+                                        status:'success',
+                                        statusCode: 200,
+                                        text: res.body.analyzed_text
+                                    });
+                                } else {
+                                    return callback({
+                                        status:'error',
+                                        statusCode: 400,
+                                        message: 'NLU processing did not work correctly.'
+                                    });
+                                }
+                            }
+                        );
+                        //method below not working, saying callback is not a function, need to see why, meanwhile using code above
+                        // processURLToText(url, contentType, function(response) {  //anonymous function will run when the callback is called
+                        //     return callback(response);
+                        // });
                     }
+                }
+            })
+            .catch(function (error) {
+                return callback({
+                    status:'error',
+                    statusCode: 400,
+                    message: 'Unsupported URL format. Neither http:// or https:// was observed.'
                 });
-                */
-
-                //method below not working, saying callback is not a function, need to see why, meanwhile using code above
-                // processURLToText(url, contentType, function(response) {  //anonymous function will run when the callback is called
-                //     return callback(response);
-                // });
-            }
-
-
-
-        });
-        urlReq.on('error', function (err) {
-            fs.unlink(dest);
-            return callback({ status:'error', statusCode: 400, message: err.message});
-        });
+            })
     };
-
-
 }
-
 
 function verifyDocumentTypeValid(value){
     var found = false;
