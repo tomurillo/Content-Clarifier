@@ -25,6 +25,8 @@ var htmlToText              = require('html-to-text');
 var fs                      = require('fs');
 var download                = require('download-file');
 
+var cookieParser = require('cookie-parser');
+
 var DiscoveryV1 = require('watson-developer-cloud/discovery/v1');
 
 // requires stanford-corenlp-4.5.1.zip uzipped to ./stanford-nlp/jar
@@ -142,9 +144,18 @@ app.use(express.static(__dirname)); // Serve the web content
 app.use(bodyParser.json({limit: '5mb'})); // support large file
 app.use(bodyParser.urlencoded({extended: true, limit: '5mb'})); // support large files
 
-app.use(express.cookieParser());
-app.use(express.session({secret: "hQp9VcWTEAdRvpXH"}));
-app.use(app.router);
+app.use(cookieParser());
+
+var sess = {
+    secret: 'hQp9VcWTEAdRvpXH',
+    cookie: {}
+}
+if (app.get('env') === 'production') {
+    app.set('trust proxy', 1) // trust first proxy
+    sess.cookie.secure = true // serve secure cookies
+}
+app.use(session(sess));
+
 app.use(compression()); // Support Gzip compression
 
 // Redirect all .mybluemix.net requests to HTTPS
