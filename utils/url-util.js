@@ -116,16 +116,6 @@ function UrlUtil() {
     };
 }
 
-function verifyDocumentTypeValid(value){
-    var found = false;
-    for(var i = 0; i < vendors.length; i++) {
-        if (vendors[i].Name == value) {
-            found = true;
-            break;
-        }
-    }
-}
-
 function getFileExtensionFromDocumentType(documentType){
     var extension = null;
     switch(documentType) {

@@ -1,8 +1,8 @@
 // Content Clarifier DB for User Authentication
 
 // SETS STAGING OR PRODUCTION ENVIRONMENT (updates DB in code as well)
-exports.CC_ENVIRONMENT = 'production';
-//exports.CC_ENVIRONMENT = 'staging';
+//exports.CC_ENVIRONMENT = 'production';
+exports.CC_ENVIRONMENT = 'staging';
 
 // Production ENV 
 exports.CC_DB_PROD_USER          = 'admin';
@@ -14,11 +14,16 @@ exports.CC_DB_PROD_CONN_LIMIT    = 151;
 
 // Staging ENV 
 exports.CC_DB_STAGING_USER          = 'admin';
-exports.CC_DB_STAGING_PASS          = 'OISYSWJPOTDAWHGS';
-exports.CC_DB_STAGING_HOST          = 'sl-us-south-1-portal.47.dblayer.com'; 
-exports.CC_DB_STAGING_PORT          = 19285; 
-exports.CC_DB_STAGING_NAME          = 'cc_staging'; 
-exports.CC_DB_STAGING_CONN_LIMIT    = 151; 
+// exports.CC_DB_STAGING_PASS          = 'OISYSWJPOTDAWHGS';
+// exports.CC_DB_STAGING_HOST          = 'sl-us-south-1-portal.47.dblayer.com';
+// exports.CC_DB_STAGING_PORT          = 19285;
+// exports.CC_DB_STAGING_NAME          = 'cc_staging';
+// exports.CC_DB_STAGING_CONN_LIMIT    = 151;
+exports.CC_DB_STAGING_PASS          = 'Admin%$123';
+exports.CC_DB_STAGING_HOST          = 'localhost';
+exports.CC_DB_STAGING_PORT          = 3306;
+exports.CC_DB_STAGING_NAME          = 'cc_staging';
+exports.CC_DB_STAGING_CONN_LIMIT    = 151;
 
 // Model on Cloud Object Storage
 exports.CC_AACSymbols = "https://s3.us-east.cloud-object-storage.appdomain.cloud/cc-model/AACSymbols.json";
@@ -84,7 +89,7 @@ exports.ENHANCE_DEFINITIONS = 2; // plain English definitions
 exports.ENHANCE_SYMBOLS = 3; // AAC Symbols
 
 // Turns verbose logging to server on or off
-exports.DEBUG_VERBOSE_LOGGING = false;
+exports.DEBUG_VERBOSE_LOGGING = true;
 
 // Regex used to strip special chars from beginning and end of a word
 exports.CLEAN_WORD_REGEX = /^\W+|\W+$/g;
