@@ -7,6 +7,8 @@
  */
 
 var express                 = require('express');
+var https                   = require('https');
+var http                    = require('http');
 var multer                  = require('multer');
 var cors                    = require('cors');
 var compression             = require('compression'); // Support gzip compression
@@ -238,7 +240,7 @@ process.on('uncaughtException', function (err) {
 // ------------------ Services ------------------------
 
 app.get('/',function(req,res,next){
-    res.sendFile('./public/index.html');
+    res.sendFile('public/index.html', { root: __dirname });
 });
 
 
@@ -270,19 +272,19 @@ app.post('/getUrlText', function(req,res,next){
 
 app.get('/cle-app-reader',function(req,res,next){
     
-    res.sendfile('./public/Editor2.html');
+    res.sendfile('public/Editor2.html', { root: __dirname });
     
 });
 
 app.get('/cle-app-select',function(req,res,next){
     
-    res.sendfile('./public/Editor3.html');
+    res.sendfile('public/Editor3.html', { root: __dirname });
     
 });
 
 app.get('/cc-plugin-app',function(req,res,next){
     
-    res.sendfile('./public/Editor4.html');
+    res.sendfile('public/Editor4.html', { root: __dirname });
     
 });
 
@@ -301,21 +303,21 @@ app.get('/app',function(req,res,next){
                     connection.release(); // always put connection back in pool after last query
                     if (err) {
                         console.error('Error while performing confirm login for DEMO_OAUTH_STATE = ' + req.session.OAUTH_STATE.toString() + ' : ' + err);
-                        res.sendfile('./public/index.html');
+                        res.sendfile('public/index.html', { root: __dirname });
                     }
                     else if(results[0] === undefined){ // Didn't find this DEMO_OAUTH_STATE, so not logged in
-                        res.sendfile('./public/index.html');
+                        res.sendfile('public/index.html', { root: __dirname });
                     }
                     else {
                         console.error('User logged in with DEMO_OAUTH_STATE = ' + req.session.OAUTH_STATE.toString());
-                        res.sendfile('./public/Editor.html');
+                        res.sendfile('public/Editor.html', { root: __dirname });
                     }
                 }); // end connection
             }); // end pool
         }
     }
     else{
-        res.sendfile('./public/Editor.html');
+        res.sendfile('public/Editor.html', { root: __dirname });
     }
 });
 
@@ -666,7 +668,7 @@ app.get('/logout', function (req, res, next) {
         }); // end pool
     }
     else{
-        res.sendfile('./public/Editor.html');
+        res.sendfile('public/Editor.html', { root: __dirname });
     }
 });
 
@@ -907,11 +909,11 @@ app.get('/api/speech-to-text/token', function(req, res) {
 });
 
 app.get('/bower_components/watson-speech/dist/watson-speech.js', function(req, res) {
-    res.sendfile ('./public/bower_components/watson-speech/dist/watson-speech.js');
+    res.sendfile ('public/bower_components/watson-speech/dist/watson-speech.js', { root: __dirname });
 });
 
 app.get('/bower_components/fetch/fetch.js', function(req, res) {
-    res.sendfile ('./public/bower_components/fetch/fetch.js');
+    res.sendfile ('public/bower_components/fetch/fetch.js', { root: __dirname });
 });
 
 
@@ -4882,7 +4884,12 @@ var cron = schedule.scheduleJob(C.POLL_FOR_NEW_USERS_CRON_FREQUENCY, function(){
     initAppUsersMap();
 });
 
-var server = app.listen(port,function(){
+const httpsOptions = {
+    key: fs.readFileSync('./ssl/key.pem'),
+    cert: fs.readFileSync('./ssl/cert.pem'),
+};
+
+var server = https.createServer(httpsOptions, app).listen(port,function() {
 
     // node --max_old_space_size=4096  server.js
     console.log("Node Express Server Started on PORT " + port);
