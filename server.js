@@ -272,19 +272,19 @@ app.post('/getUrlText', function(req,res,next){
 
 app.get('/cle-app-reader',function(req,res,next){
     
-    res.sendfile('public/Editor2.html', { root: __dirname });
+    res.sendFile('public/Editor2.html', { root: __dirname });
     
 });
 
 app.get('/cle-app-select',function(req,res,next){
     
-    res.sendfile('public/Editor3.html', { root: __dirname });
+    res.sendFile('public/Editor3.html', { root: __dirname });
     
 });
 
 app.get('/cc-plugin-app',function(req,res,next){
     
-    res.sendfile('public/Editor4.html', { root: __dirname });
+    res.sendFile('public/Editor4.html', { root: __dirname });
     
 });
 
@@ -303,21 +303,21 @@ app.get('/app',function(req,res,next){
                     connection.release(); // always put connection back in pool after last query
                     if (err) {
                         console.error('Error while performing confirm login for DEMO_OAUTH_STATE = ' + req.session.OAUTH_STATE.toString() + ' : ' + err);
-                        res.sendfile('public/index.html', { root: __dirname });
+                        res.sendFile('public/index.html', { root: __dirname });
                     }
                     else if(results[0] === undefined){ // Didn't find this DEMO_OAUTH_STATE, so not logged in
-                        res.sendfile('public/index.html', { root: __dirname });
+                        res.sendFile('public/index.html', { root: __dirname });
                     }
                     else {
                         console.error('User logged in with DEMO_OAUTH_STATE = ' + req.session.OAUTH_STATE.toString());
-                        res.sendfile('public/Editor.html', { root: __dirname });
+                        res.sendFile('public/Editor.html', { root: __dirname });
                     }
                 }); // end connection
             }); // end pool
         }
     }
     else{
-        res.sendfile('public/Editor.html', { root: __dirname });
+        res.sendFile('public/Editor.html', { root: __dirname });
     }
 });
 
@@ -668,7 +668,7 @@ app.get('/logout', function (req, res, next) {
         }); // end pool
     }
     else{
-        res.sendfile('public/Editor.html', { root: __dirname });
+        res.sendFile('public/Editor.html', { root: __dirname });
     }
 });
 
@@ -909,11 +909,11 @@ app.get('/api/speech-to-text/token', function(req, res) {
 });
 
 app.get('/bower_components/watson-speech/dist/watson-speech.js', function(req, res) {
-    res.sendfile ('public/bower_components/watson-speech/dist/watson-speech.js', { root: __dirname });
+    res.sendFile ('public/bower_components/watson-speech/dist/watson-speech.js', { root: __dirname });
 });
 
 app.get('/bower_components/fetch/fetch.js', function(req, res) {
-    res.sendfile ('public/bower_components/fetch/fetch.js', { root: __dirname });
+    res.sendFile ('public/bower_components/fetch/fetch.js', { root: __dirname });
 });
 
 
